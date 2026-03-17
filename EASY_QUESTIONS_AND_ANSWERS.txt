@@ -1,0 +1,439 @@
+================================================================================
+                    EASY SQL QUESTIONS WITH ANSWERS
+                    Customer Database Analysis
+================================================================================
+
+SETUP (Run this first in your notebook):
+----------------------------------------
+import duckdb
+con = duckdb.connect('data.duckdb', read_only=True)
+
+
+================================================================================
+QUESTION 1: How many total customers are there?
+================================================================================
+
+query = "SELECT COUNT(*) as total_customers FROM customers"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 2: What banks are in the dataset?
+================================================================================
+
+query = "SELECT DISTINCT bank_name FROM customers"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 3: How many customers does each bank have?
+================================================================================
+
+query = """
+SELECT 
+    bank_name, 
+    COUNT(*) as customer_count
+FROM customers
+GROUP BY bank_name
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 4: How many male and female customers?
+================================================================================
+
+query = """
+SELECT 
+    gender, 
+    COUNT(*) as count
+FROM customers
+WHERE gender IS NOT NULL
+GROUP BY gender
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 5: What is the highest income?
+================================================================================
+
+query = "SELECT MAX(annual_income) as highest_income FROM customers"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 6: What is the lowest income?
+================================================================================
+
+query = "SELECT MIN(annual_income) as lowest_income FROM customers"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 7: What is the average income?
+================================================================================
+
+query = "SELECT ROUND(AVG(annual_income), 2) as average_income FROM customers"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 8: Show first 10 customers
+================================================================================
+
+query = """
+SELECT 
+    customer_id, 
+    full_name, 
+    bank_name, 
+    annual_income 
+FROM customers 
+LIMIT 10
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 9: How many retired customers?
+================================================================================
+
+query = "SELECT COUNT(*) as retired_count FROM customers WHERE occupation = 'Retired'"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 10: List all occupations with counts
+================================================================================
+
+query = """
+SELECT 
+    occupation, 
+    COUNT(*) as count
+FROM customers
+GROUP BY occupation
+ORDER BY count DESC
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 11: What are the sources of funds?
+================================================================================
+
+query = """
+SELECT 
+    primary_source_of_funds, 
+    COUNT(*) as count
+FROM customers
+WHERE primary_source_of_funds IS NOT NULL
+GROUP BY primary_source_of_funds
+ORDER BY count DESC
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 12: Find high earners (income > 50000)
+================================================================================
+
+query = """
+SELECT 
+    full_name, 
+    annual_income, 
+    occupation
+FROM customers
+WHERE annual_income > 50000
+ORDER BY annual_income DESC
+LIMIT 10
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 13: How many customers in Great Britain?
+================================================================================
+
+query = "SELECT COUNT(*) as gb_customers FROM customers WHERE country_of_residence = 'GB'"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 14: What ID document types exist?
+================================================================================
+
+query = """
+SELECT 
+    id_doc_type, 
+    COUNT(*) as count
+FROM customers
+WHERE id_doc_type IS NOT NULL
+GROUP BY id_doc_type
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 15: Find all customers with surname 'Smith'
+================================================================================
+
+query = """
+SELECT 
+    customer_id, 
+    full_name, 
+    bank_name
+FROM customers
+WHERE surname = 'Smith'
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 16: Count by nationality
+================================================================================
+
+query = """
+SELECT 
+    nationality, 
+    COUNT(*) as count
+FROM customers
+GROUP BY nationality
+ORDER BY count DESC
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 17: Average income for retired people
+================================================================================
+
+query = """
+SELECT 
+    ROUND(AVG(annual_income), 2) as avg_retired_income
+FROM customers
+WHERE occupation = 'Retired'
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 18: Find the youngest customer
+================================================================================
+
+query = """
+SELECT 
+    full_name, 
+    date_of_birth,
+    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM date_of_birth) as age
+FROM customers
+ORDER BY date_of_birth DESC
+LIMIT 1
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 19: Find the oldest customer
+================================================================================
+
+query = """
+SELECT 
+    full_name, 
+    date_of_birth,
+    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM date_of_birth) as age
+FROM customers
+ORDER BY date_of_birth ASC
+LIMIT 1
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 20: How many use Gmail?
+================================================================================
+
+query = "SELECT COUNT(*) as gmail_users FROM customers WHERE email LIKE '%gmail%'"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 21: Average income by bank
+================================================================================
+
+query = """
+SELECT 
+    bank_name,
+    ROUND(AVG(annual_income), 2) as avg_income
+FROM customers
+GROUP BY bank_name
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 22: Count by title (Mr, Mrs, Dr)
+================================================================================
+
+query = """
+SELECT 
+    title_salutation,
+    COUNT(*) as count
+FROM customers
+WHERE title_salutation IS NOT NULL
+GROUP BY title_salutation
+ORDER BY count DESC
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 23: Find managers
+================================================================================
+
+query = """
+SELECT 
+    full_name,
+    occupation,
+    annual_income
+FROM customers
+WHERE occupation LIKE '%manager%'
+ORDER BY annual_income DESC
+LIMIT 10
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 24: How many unemployed?
+================================================================================
+
+query = "SELECT COUNT(*) as unemployed FROM customers WHERE occupation = 'Unemployed'"
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 25: Retired vs Working comparison
+================================================================================
+
+query = """
+SELECT 
+    CASE 
+        WHEN occupation = 'Retired' THEN 'Retired'
+        ELSE 'Working/Other'
+    END as status,
+    COUNT(*) as count,
+    ROUND(AVG(annual_income), 2) as avg_income
+FROM customers
+GROUP BY status
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 26: Top 5 highest paid occupations
+================================================================================
+
+query = """
+SELECT 
+    occupation,
+    COUNT(*) as count,
+    ROUND(AVG(annual_income), 2) as avg_income
+FROM customers
+WHERE annual_income IS NOT NULL
+GROUP BY occupation
+ORDER BY avg_income DESC
+LIMIT 5
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 27: Customers by age group
+================================================================================
+
+query = """
+SELECT 
+    CASE 
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM date_of_birth) < 30 THEN '18-29'
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM date_of_birth) < 40 THEN '30-39'
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM date_of_birth) < 50 THEN '40-49'
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM date_of_birth) < 60 THEN '50-59'
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM date_of_birth) < 70 THEN '60-69'
+        ELSE '70+'
+    END as age_group,
+    COUNT(*) as count
+FROM customers
+GROUP BY age_group
+ORDER BY age_group
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 28: Income by gender
+================================================================================
+
+query = """
+SELECT 
+    gender,
+    COUNT(*) as count,
+    ROUND(AVG(annual_income), 2) as avg_income,
+    MAX(annual_income) as max_income
+FROM customers
+WHERE gender IS NOT NULL
+GROUP BY gender
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 29: Find customers with pension as source
+================================================================================
+
+query = """
+SELECT 
+    full_name,
+    occupation,
+    annual_income,
+    primary_source_of_funds
+FROM customers
+WHERE primary_source_of_funds = 'Pension'
+LIMIT 10
+"""
+con.execute(query).df()
+
+
+================================================================================
+QUESTION 30: Summary statistics
+================================================================================
+
+query = """
+SELECT 
+    COUNT(*) as total_customers,
+    COUNT(DISTINCT bank_name) as banks,
+    ROUND(AVG(annual_income), 2) as avg_income,
+    MAX(annual_income) as max_income,
+    MIN(annual_income) as min_income,
+    SUM(CASE WHEN gender = 'M' THEN 1 ELSE 0 END) as males,
+    SUM(CASE WHEN gender = 'F' THEN 1 ELSE 0 END) as females,
+    SUM(CASE WHEN occupation = 'Retired' THEN 1 ELSE 0 END) as retired
+FROM customers
+"""
+con.execute(query).df()
+
+
+================================================================================
+                            END OF QUESTIONS
+================================================================================
+
+TIPS:
+-----
+1. Always connect to database first: con = duckdb.connect('data.duckdb', read_only=True)
+2. Use single quotes for text in SQL: WHERE occupation = 'Retired'
+3. Use COUNT(*) to count rows
+4. Use AVG(), MAX(), MIN() for calculations
+5. Use GROUP BY when counting categories
+6. Use ORDER BY to sort results
+7. Use LIMIT to show only top results
+
+================================================================================

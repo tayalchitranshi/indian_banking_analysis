@@ -1,0 +1,14 @@
+# Data files
+*.duckdb
+*.duckdb.wal
+*.parquet
+*.crc
+_SUCCESS.crc
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Kiro
+.kiro/
